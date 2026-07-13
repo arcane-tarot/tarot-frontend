@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tarot de una carta</title>
+    <link rel="preconnect" href="https://commons.wikimedia.org" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main
+      class="app-shell"
+      data-interpretation-endpoint="http://localhost:8000/api/tarot/interpretations"
+    >
+      <section class="reading-panel" aria-labelledby="app-title">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">MVP tarot</p>
+            <h1 id="app-title">Tirada de una carta</h1>
+          </div>
+
+          <fieldset class="deck-toggle" aria-label="Tipo de mazo">
+            <legend>Tipo de mazo</legend>
+            <label>
+              <input type="radio" name="deck-type" value="major" checked />
+              <span>Mayores</span>
+            </label>
+            <label>
+              <input type="radio" name="deck-type" value="minor" />
+              <span>Menores</span>
+            </label>
+            <label>
+              <input type="radio" name="deck-type" value="all" />
+              <span>Ambos</span>
+            </label>
+          </fieldset>
+        </div>
+
+        <div class="board" aria-live="polite">
+          <button class="tarot-card" id="card-button" type="button" aria-label="Voltear carta">
+            <span class="card-face card-back" aria-hidden="true">
+              <span class="back-frame">
+                <span class="moon">☾</span>
+                <span class="star-grid">✦ ✧ ✦</span>
+                <span class="back-title">Tarot</span>
+                <span class="star-grid">✧ ✦ ✧</span>
+              </span>
+            </span>
+            <span class="card-face card-front">
+              <span class="image-wrap">
+                <img id="card-image" alt="" />
+                <span class="image-fallback" id="image-fallback"></span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <aside class="card-info" id="card-info" hidden>
+          <p class="card-kind" id="card-kind"></p>
+          <h2 id="card-name"></h2>
+          <p id="card-meaning"></p>
+        </aside>
+
+        <form class="question-panel" id="question-form">
+          <label for="question-input">Tu pregunta</label>
+          <div class="question-row">
+            <textarea
+              id="question-input"
+              name="question"
+              rows="3"
+              placeholder="Ej: Que necesito entender sobre esta decision?"
+            ></textarea>
+            <button class="secondary-action" id="interpret-button" type="submit" disabled>
+              Interpretar
+            </button>
+          </div>
+          <p class="form-note" id="interpretation-status">
+            Revela una carta y escribe tu pregunta para pedir una lectura contextual.
+          </p>
+        </form>
+
+        <aside class="ai-reading" id="ai-reading" hidden>
+          <p class="card-kind">Lectura contextual</p>
+          <p id="ai-reading-text"></p>
+        </aside>
+
+        <div class="actions">
+          <button class="primary-action" id="draw-button" type="button">Sacar carta</button>
+          <p id="hint">Elige un mazo y pulsa la carta o el boton para revelar tu tirada.</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
