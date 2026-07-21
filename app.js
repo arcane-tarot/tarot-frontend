@@ -85,14 +85,26 @@ const questionForm = document.querySelector("#question-form");
 const questionInput = document.querySelector("#question-input");
 const interpretButton = document.querySelector("#interpret-button");
 const interpretationStatus = document.querySelector("#interpretation-status");
+const oracleLoader = document.querySelector("#oracle-loader");
+const oracleMessage = document.querySelector("#oracle-message");
 const aiReading = document.querySelector("#ai-reading");
 const aiReadingText = document.querySelector("#ai-reading-text");
 const interpretationEndpoint = appShell.dataset.interpretationEndpoint;
+
+const oracleMessages = [
+  "Consultando el oráculo…",
+  "Esperando respuesta de los astros…",
+  "Leyendo las señales entre las estrellas…",
+  "La bola de cristal está tomando forma…",
+  "Barajando posibilidades del destino…",
+];
 
 let selectedDeck = "major";
 let currentCard = null;
 let isRevealed = false;
 let isRequestingInterpretation = false;
+let oracleMessageIndex = 0;
+let oracleMessageTimer = null;
 
 deckInputs.forEach((input) => {
   input.addEventListener("change", () => {
@@ -179,7 +191,7 @@ async function requestContextualReading(event) {
   isRequestingInterpretation = true;
   aiReading.hidden = true;
   aiReadingText.textContent = "";
-  setInterpretationStatus("Consultando el microservicio...");
+  startOracleLoader();
   updateInterpretButton();
 
   try {
@@ -220,8 +232,33 @@ async function requestContextualReading(event) {
     );
   } finally {
     isRequestingInterpretation = false;
+    stopOracleLoader();
     updateInterpretButton();
   }
+}
+
+function startOracleLoader() {
+  window.clearInterval(oracleMessageTimer);
+  oracleMessageIndex = Math.floor(Math.random() * oracleMessages.length);
+  interpretationStatus.hidden = true;
+  oracleLoader.hidden = false;
+  showNextOracleMessage();
+  oracleMessageTimer = window.setInterval(showNextOracleMessage, 2400);
+}
+
+function stopOracleLoader() {
+  window.clearInterval(oracleMessageTimer);
+  oracleMessageTimer = null;
+  oracleLoader.hidden = true;
+  interpretationStatus.hidden = false;
+}
+
+function showNextOracleMessage() {
+  oracleMessage.textContent = oracleMessages[oracleMessageIndex];
+  oracleMessageIndex = (oracleMessageIndex + 1) % oracleMessages.length;
+  oracleMessage.classList.remove("is-changing");
+  void oracleMessage.offsetWidth;
+  oracleMessage.classList.add("is-changing");
 }
 
 function updateInterpretButton() {
