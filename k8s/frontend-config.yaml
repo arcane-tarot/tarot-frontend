@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tarot-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tarot-frontend
+  template:
+    metadata:
+      labels:
+        app: tarot-frontend
+    spec:
+      imagePullSecrets:
+        - name: ghcr-credentials
+      containers:
+        - name: frontend
+          image: ghcr.io/arcane-tarot/tarot-frontend:latest
+          ports: #Port 80 baptized as http for probes
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tarot-frontend
+spec:
+  selector:
+    app: tarot-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
