@@ -98,6 +98,7 @@ const oracleMessages = [
   "La bola de cristal está tomando forma…",
   "Barajando posibilidades del destino…",
 ];
+const minimumOracleLoaderDuration = 2200;
 
 let selectedDeck = "major";
 let currentCard = null;
@@ -105,6 +106,7 @@ let isRevealed = false;
 let isRequestingInterpretation = false;
 let oracleMessageIndex = 0;
 let oracleMessageTimer = null;
+let oracleLoaderStartedAt = 0;
 
 deckInputs.forEach((input) => {
   input.addEventListener("change", () => {
@@ -222,10 +224,12 @@ async function requestContextualReading(event) {
       throw new Error("Respuesta sin interpretacion");
     }
 
+    await waitForOracleLoader();
     aiReadingText.textContent = interpretation;
     aiReading.hidden = false;
     setInterpretationStatus("Lectura recibida.");
   } catch (error) {
+    await waitForOracleLoader();
     setInterpretationStatus(
       "El microservicio todavia no respondio. Cuando exista, debe aceptar POST /api/tarot/interpretations.",
       true,
@@ -240,10 +244,11 @@ async function requestContextualReading(event) {
 function startOracleLoader() {
   window.clearInterval(oracleMessageTimer);
   oracleMessageIndex = Math.floor(Math.random() * oracleMessages.length);
+  oracleLoaderStartedAt = Date.now();
   interpretationStatus.hidden = true;
   oracleLoader.hidden = false;
   showNextOracleMessage();
-  oracleMessageTimer = window.setInterval(showNextOracleMessage, 2400);
+  oracleMessageTimer = window.setInterval(showNextOracleMessage, 1400);
 }
 
 function stopOracleLoader() {
@@ -251,6 +256,12 @@ function stopOracleLoader() {
   oracleMessageTimer = null;
   oracleLoader.hidden = true;
   interpretationStatus.hidden = false;
+}
+
+function waitForOracleLoader() {
+  const elapsedTime = Date.now() - oracleLoaderStartedAt;
+  const remainingTime = Math.max(0, minimumOracleLoaderDuration - elapsedTime);
+  return new Promise((resolve) => window.setTimeout(resolve, remainingTime));
 }
 
 function showNextOracleMessage() {
